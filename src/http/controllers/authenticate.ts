@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { prisma } from "../../lib/prisma";
-import { compare } from "bcryptjs";
+import { makeAuthenticateUseCase } from "../../useCases/factories/makeAuthenticateUseCase";
+import { InvalidCredentials } from "../../useCases/errors/InvalidCredentials";
 
 export async function authenticate(request: FastifyRequest, reply: FastifyReply) {
 
@@ -12,23 +12,28 @@ export async function authenticate(request: FastifyRequest, reply: FastifyReply)
 
     const { email, password } = requetsBodySchema.parse(request.body)
 
-    const user = await prisma.user.findUnique({ where: { email } })
-    if (!user) {
-        throw new Error('Invalid credentials')
-    }
+    try {
+        const authenticateUseCase = makeAuthenticateUseCase()
+        const { user } = await authenticateUseCase.execute({ email, password })
 
-    const password_hash = await compare(password, user.password)
-    if (!password_hash) {
-        throw new Error('Invalid credentials')
-    }
+        const token = await reply.jwtSign({}, {
+            sign: {
+                sub: user.id
+            }
+        })
 
-    const token = await reply.jwtSign({}, {
-        sign: {
-            sub: user.id
+        return reply.status(200).send(token)
+
+    } catch (error) {
+        if (error instanceof InvalidCredentials) {
+            return reply.status(400).send({ message: error.message })
         }
-    })
+        throw error
+    }
 
 
-    return reply.status(200).send(token)
+
+
+
 
 }
