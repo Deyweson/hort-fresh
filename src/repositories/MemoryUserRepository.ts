@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { IUserRepository, IUserdata } from "./IUserRepository";
 
 export class MemoryUserRepository implements IUserRepository {
@@ -5,7 +6,12 @@ export class MemoryUserRepository implements IUserRepository {
     private users: IUserdata[] = []
 
     async create({ name, email, password }: IUserdata) {
-        const user = { name, email, password }
+        const user = {
+            id: randomUUID(),
+            name,
+            email,
+            password
+        }
         this.users.push(user)
         return user
     }

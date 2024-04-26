@@ -21,8 +21,8 @@ export class RegisterUseCase {
             throw new EmailAlreadyInUse()
         }
 
-        await this.userRepository.create({ name, email, password: password_hashed })
+        const user = await this.userRepository.create({ name, email, password: password_hashed })
 
-        return
+        return user
     }
 }

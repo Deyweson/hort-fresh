@@ -8,6 +8,6 @@ export interface IUserdata {
 
 
 export interface IUserRepository {
-    create(data: IUserdata): Promise<IUserdata | null>
+    create(data: IUserdata): Promise<IUserdata>
     findByEmail(email: string): Promise<IUserdata | null>
 }
