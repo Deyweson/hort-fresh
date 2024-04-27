@@ -1,10 +1,15 @@
 import { prisma } from "../lib/prisma";
-import { IUserRepository, IUserdata } from "./IUserRepository";
+import { IUserCreateInput, IUserRepository } from "./IUserRepository";
 
 export class PrismaUserRepository implements IUserRepository {
 
-    async create({ name, email, password }: IUserdata) {
-        const user = await prisma.user.create({ data: { name, email, password } });
+    async findById(id: string) {
+        const user = await prisma.user.findUnique({ where: { id }, include: { UserInfo: true } })
+        return user
+    }
+
+    async create({ name, email, password }: IUserCreateInput) {
+        const user = await prisma.user.create({ data: { name, email, password, UserInfo: { create: {} } } });
         return user;
     }
 

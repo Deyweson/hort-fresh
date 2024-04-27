@@ -14,10 +14,27 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
+  id       String     @id @default(uuid())
   name     String
-  email    String @unique
+  email    String     @unique
   password String
+  UserInfo UserInfo[]
 
   @@map("users")
+}
+
+model UserInfo {
+  id      String   @id @default(uuid())
+  street  String?
+  number  Int?
+  city    String?
+  state   String?
+  zipCode Int?     @map("zip_code")
+  phone   String?
+  verify  Boolean? @default(false)
+
+  userid User   @relation(fields: [userId], references: [id])
+  userId String @unique @map("user_id")
+
+  @@map("user_info")
 }

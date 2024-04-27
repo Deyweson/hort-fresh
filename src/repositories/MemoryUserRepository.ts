@@ -1,11 +1,19 @@
 import { randomUUID } from "crypto";
-import { IUserRepository, IUserdata } from "./IUserRepository";
+import { IUser, IUserCreateInput, IUserRepository } from "./IUserRepository";
 
 export class MemoryUserRepository implements IUserRepository {
+    private users: IUser[] = []
 
-    private users: IUserdata[] = []
+    async findById(id: string) {
+        const user = this.users.find((user) => user.id === id)
+        if (user === undefined) {
+            return null
+        }
+        return user
+    }
 
-    async create({ name, email, password }: IUserdata) {
+
+    async create({ name, email, password }: IUserCreateInput) {
         const user = {
             id: randomUUID(),
             name,
